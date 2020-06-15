@@ -2,7 +2,7 @@ package main
 
 import "fmt"
 
-func main(){
+func main() {
 	fmt.Println("main")
 	var s1 string
 	s1 = "王二狗"

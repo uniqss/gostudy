@@ -2,17 +2,17 @@ package main
 
 import "fmt"
 
-func main(){
+func main() {
 	/*
-	score := 0
-	fmt.Println("请输入成绩")
-	fmt.Scanln(&score)
-	if score >= 60 {
-		fmt.Println("成绩及格")
-	} else {
-		fmt.Println("成绩不及格")
-	}
-	 */
+		score := 0
+		fmt.Println("请输入成绩")
+		fmt.Scanln(&score)
+		if score >= 60 {
+			fmt.Println("成绩及格")
+		} else {
+			fmt.Println("成绩不及格")
+		}
+	*/
 
 	gender := "男"
 	fmt.Scanln(&gender)

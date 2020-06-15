@@ -5,7 +5,7 @@ import (
 	"net/http"
 )
 
-func main(){
+func main() {
 	http.HandleFunc("/", defaultHandler)
 
 	err := http.ListenAndServe(":9090", nil)

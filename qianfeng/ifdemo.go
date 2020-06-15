@@ -2,7 +2,7 @@ package main
 
 import "fmt"
 
-func main(){
+func main() {
 	num := 6
 	if num > 10 {
 		fmt.Println("大于10")
@@ -15,5 +15,3 @@ func main(){
 
 	fmt.Println("main over...")
 }
-
-

@@ -14,8 +14,8 @@ func main() {
 	fmt.Println(a, b, c)
 
 	const (
-		MALE = iota
-		FEMALE = iota
+		MALE    = iota
+		FEMALE  = iota
 		UNKNOWN = iota
 	)
 	fmt.Println(MALE, FEMALE, UNKNOWN)

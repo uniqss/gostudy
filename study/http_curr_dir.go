@@ -7,7 +7,7 @@ import (
 	"net/http"
 )
 
-func main(){
+func main() {
 	var host string
 	var port int
 

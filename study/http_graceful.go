@@ -13,7 +13,7 @@ var (
 	listenAddr string
 )
 
-func main(){
+func main() {
 	flag.StringVar(&listenAddr, "listen-addr", ":9090", "server listen address")
 	flag.Parse()
 
@@ -22,18 +22,18 @@ func main(){
 	logger.Println("server is ready to handle request at:", listenAddr)
 
 	router := http.NewServeMux()
-	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request){
+	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		fmt.Fprintf(w, "hello world")
 	})
 
 	server := &http.Server{
-		Addr : listenAddr,
-		Handler: router,
-		ErrorLog: logger,
-		ReadTimeout: 5 * time.Second,
-		WriteTimeout: 5 *time.Second,
-		IdleTimeout: 5 * time.Second,
+		Addr:         listenAddr,
+		Handler:      router,
+		ErrorLog:     logger,
+		ReadTimeout:  5 * time.Second,
+		WriteTimeout: 5 * time.Second,
+		IdleTimeout:  5 * time.Second,
 	}
 
 	server.SetKeepAlivesEnabled(false)

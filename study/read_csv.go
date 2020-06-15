@@ -8,18 +8,18 @@ import (
 	"strings"
 )
 
-func main(){
+func main() {
 	G_QuestListMap = make(map[int]*Quest)
 	ReadCsv_ConfigFile_Quest()
 }
 
 type Quest struct {
-	questId int
+	questId   int
 	questType int
-	name string
-	npcid int
-	level int
-	reward string
+	name      string
+	npcid     int
+	level     int
+	reward    string
 }
 
 var G_QuestListMap map[int]*Quest
@@ -45,8 +45,8 @@ func ReadCsv_ConfigFile_Quest() bool {
 	fmt.Println("获取的数据：", data)
 	fmt.Println("获取的数据长度：", len_cntb)
 
-	for i:=0;i < len_cntb;i++ {
-		dataTmp := new (Quest)
+	for i := 0; i < len_cntb; i++ {
+		dataTmp := new(Quest)
 		questId, _ := strconv.Atoi(data[i][0])
 		dataTmp.questId = questId
 		dataTmp.name = data[i][2]
@@ -60,6 +60,6 @@ func ReadCsv_ConfigFile_Quest() bool {
 	}
 
 	fmt.Println("G_QuestListMap:", G_QuestListMap)
-	
+
 	return true
 }

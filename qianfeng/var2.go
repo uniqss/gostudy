@@ -4,6 +4,7 @@ import "fmt"
 
 var a = 10000
 var b int = 2000
+
 //c := 3000 // syntax error: non-declaration statement outside function body
 
 func main() {

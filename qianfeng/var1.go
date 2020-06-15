@@ -30,8 +30,8 @@ func main() {
 
 	var (
 		studentName = "李小花"
-		age = 18
-		gender = "女"
+		age         = 18
+		gender      = "女"
 	)
 	fmt.Printf("学生姓名：%s 年龄：%d 性别：%s\n", studentName, age, gender)
 }

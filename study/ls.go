@@ -7,7 +7,7 @@ import (
 	"os"
 )
 
-func main(){
+func main() {
 	var dir string
 	flag.StringVar(&dir, "dir", ".", "the dir to list")
 	flag.Parse()

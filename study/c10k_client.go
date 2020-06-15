@@ -6,7 +6,7 @@ import (
 	"net"
 )
 
-func tryconnect(i int){
+func tryconnect(i int) {
 	fmt.Println("tryconnect i:", i)
 	conn, err := net.Dial("tcp", "127.0.0.1:8080")
 	if err != nil {
@@ -26,8 +26,8 @@ func tryconnect(i int){
 	}
 }
 
-func main(){
-	for i:=0; i < 10000;i++ {
+func main() {
+	for i := 0; i < 10000; i++ {
 		go tryconnect(i)
 	}
 }
