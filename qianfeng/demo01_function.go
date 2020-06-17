@@ -3,7 +3,7 @@ package main
 import "fmt"
 
 func main() {
-	s1 := getSum(1, 100)
+	s1 := getSum(1, 10)
 	fmt.Printf("%d\n", s1)
 }
 
