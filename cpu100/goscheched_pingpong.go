@@ -8,17 +8,21 @@ import (
 
 func ping(){
 	for {
+		// every program should have at most one runtime.Gosched() call !!!
 		runtime.Gosched()
 	}
 }
 
 func pong(){
 	for  {
+		// every program should have at most one runtime.Gosched() call !!!
 		runtime.Gosched()
 	}
 }
 
 func main()  {
+
+	// every program should have at most one runtime.Gosched() call !!!
 	go ping()
 	go pong()
 

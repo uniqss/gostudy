@@ -14,6 +14,7 @@ func for_select_default() {
 		select {
 		case <-ch:
 			fmt.Println("ch channel triggered")
+			// this default should be deleted!!!
 		default:
 		}
 	}
