@@ -1,8 +1,8 @@
 package wrappers
 
 import (
-	"github.com/globalsign/mgo"
 	"errors"
+	"github.com/globalsign/mgo"
 	log "github.com/sirupsen/logrus"
 )
 
