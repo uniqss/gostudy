@@ -6,8 +6,8 @@ import (
 	"db_pressure_test/wrappers"
 	"fmt"
 	"runtime"
+	"sync"
 	"time"
-
 	//fastprefork "github.com/valyala/fasthttp/prefork"
 )
 
@@ -43,28 +43,44 @@ func DB() {
 	common.ReleaseWorld(w)
 }
 
-func pressureTest() {
-	u := common.User{UId: 1, InfoJson: ""}
+func printTimePre() int64 {
+	fmt.Println()
+	fmt.Println(time.Now().Format("2006-01-02 15:04:05"))
+	start := time.Now().UnixNano()
+	return start
+}
+
+func printTimePost(start int64) {
+	fmt.Println(time.Now().Format("2006-01-02 15:04:05"))
+	end := time.Now().UnixNano()
+	fmt.Printf("cost is :%d \n", (end-start)/1000)
+}
+
+func pressureTest(idx int, connCount int) {
+	wg.Add(1)
+	//u := common.User{UId: 1, InfoJson: ""}
 	ctx := context.Background()
 	insertCount := 10000000
 
 	bInsert := 1 == 1
 	if bInsert {
-		fmt.Println()
-		fmt.Println(time.Now().Format("2006-01-02 15:04:05"))
-		start := time.Now().UnixNano()
-		for i := 0; i < insertCount; i++ {
-			u.UId = int32(i + 1)
-			u.InfoJson = fmt.Sprintf("{\"InfoId\":\"%v\"}", u.UId)
-			_, err := wrappers.Db.Exec(ctx, "insert into pressure_test(uid, info_json) values($1, $2)", u.UId, u.InfoJson)
+		users := make([]common.User, insertCount/connCount)
+		for i := 0; i < insertCount/connCount; i++ {
+			users[i].UId = int32(i*connCount + idx + 1)
+			users[i].InfoJson = fmt.Sprintf("{\"InfoId\":\"%v\"}", users[i].UId)
+		}
+		for i := 0; i < insertCount / connCount; i++ {
+			//u.UId = int32(i + 1)
+			//u.InfoJson = fmt.Sprintf("{\"InfoId\":\"%v\"}", u.UId)
+			//_, err := wrappers.Db.Exec(ctx, "insert into pressure_test(uid, info_json) values($1, $2)", u.UId, u.InfoJson)
+			_, err := wrappers.Db.Exec(ctx, "insert into pressure_test(uid, info_json) values($1, $2)", users[i].UId, users[i].InfoJson)
 			if err != nil {
-				fmt.Println("wrappers.Db.Exec err:", err, " u.UId:", u.UId, " u.InfoJson:", u.InfoJson)
+				//fmt.Println("wrappers.Db.Exec err:", err, " u.UId:", u.UId, " u.InfoJson:", u.InfoJson)
+				fmt.Println("wrappers.Db.Exec err:", err, " u.UId:", users[i].UId, " u.InfoJson:", users[i].InfoJson)
 			}
 		}
-		fmt.Println(time.Now().Format("2006-01-02 15:04:05"))
-		end := time.Now().UnixNano()
-		fmt.Printf("cost is :%d \n", ( end-start)/1000)
 	}
+	wg.Done()
 }
 
 func numCPU() int {
@@ -76,6 +92,8 @@ func numCPU() int {
 	return n
 }
 
+var wg sync.WaitGroup
+
 func main() {
 	maxConn := numCPU() * 4
 	//if fastprefork.IsChild() {
@@ -85,15 +103,23 @@ func main() {
 	//ctx, cancelFunc := context.WithCancel(context.Background())
 
 	//go func() {
-		err := wrappers.InitDB(maxConn)
-		if err != nil {
-			fmt.Println("wrappers.InitDB err:", err)
-		}
+	err := wrappers.InitDB(maxConn)
+	if err != nil {
+		fmt.Println("wrappers.InitDB err:", err)
+	}
 	//}()
 	//for i:=1;i < 10;i++ {
 	//	DB()
 	//}
-	pressureTest()
+	time.Sleep(time.Second * 3)
+	connCount := 8
+	start := printTimePre()
+	for i := 0; i < connCount; i++ {
+		go pressureTest(i, connCount)
+	}
+	time.Sleep(time.Second * 1)
+	wg.Wait()
+	printTimePost(start)
 	//wrappers.CloseDB()
 	//cancelFunc()
 }
