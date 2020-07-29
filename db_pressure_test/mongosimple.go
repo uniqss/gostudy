@@ -8,6 +8,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
+	"strings"
 	"time"
 )
 
@@ -25,9 +26,9 @@ func main() {
 		}
 	}()
 
-	ctx, cancel = context.WithTimeout(context.Background(), 2*time.Second)
-	defer cancel()
-	err = client.Ping(ctx, readpref.Primary())
+	ctx2, cancel2 := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel2()
+	err = client.Ping(ctx2, readpref.Primary())
 	if err != nil {
 		log.Error("client.Ping err:", err)
 	}
@@ -111,17 +112,26 @@ func main() {
 		log.Error("collection.UpdateOne err", err)
 	}
 
-	// find
-	fOne = collection.FindOne(ctx, bson.M{"uid": userId}, &options.FindOneOptions{})
-	if fOne.Err() != nil {
-		log.Warn("collection.FindOne fOne.Err():", fOne.Err())
-	} else {
-		err = fOne.Decode(&result)
-		if err != nil {
-			log.Error("fOne.Decode err:", err)
+	var input string
+	for  {
+		fmt.Scanln(&input)
+		input = strings.ToLower(input)
+		if input == "e" || input == "exit" {
+			break
 		}
-		fmt.Println(result)
-	}
 
-	defer cancel()
+		if input == "f" {
+			// find
+			fOne = collection.FindOne(ctx, bson.M{"uid": userId}, &options.FindOneOptions{})
+			if fOne.Err() != nil {
+				log.Warn("collection.FindOne fOne.Err():", fOne.Err())
+			} else {
+				err = fOne.Decode(&result)
+				if err != nil {
+					log.Error("fOne.Decode err:", err)
+				}
+				fmt.Println(result)
+			}
+		}
+	}
 }

@@ -6,6 +6,7 @@ import (
 	"github.com/jackc/pgx/v4/pgxpool"
 	log "github.com/sirupsen/logrus"
 	"runtime"
+	"strings"
 )
 
 const (
@@ -74,10 +75,11 @@ func doUpdate(ctx context.Context, sql string, userId int) {
 	}
 }
 func doSelect(ctx context.Context, sql string, userId int) {
-	_, err := DbSimple.Exec(ctx, sql, userId)
+	cmdTags, err := DbSimple.Exec(ctx, sql, userId)
 	if err != nil {
 		log.Error("DbSimple.Exec err:", err, " sql:", sql)
 	}
+	fmt.Println(cmdTags.String())
 }
 
 func main() {
@@ -93,8 +95,8 @@ func main() {
 
 	userId := 50000000
 	var sql string
-	sql = "insert into pressure_test(uid, info_json) values($1, $2)"
-	doInsert(ctx, sql, userId)
+	//sql = "insert into pressure_test(uid, info_json) values($1, $2)"
+	//doInsert(ctx, sql, userId)
 
 	sql = "delete from pressure_test where uid = $1"
 	doDelete(ctx, sql, userId)
@@ -102,9 +104,19 @@ func main() {
 	sql = "insert into pressure_test(uid, info_json) values($1, $2)"
 	doInsert(ctx, sql, userId)
 
-	sql = "update pressure_test set info_json.level = $1 where uid = $2"
-	doUpdate(ctx, sql, userId)
+	//sql = "update pressure_test set info_json.level = $1 where uid = $2"
+	//doUpdate(ctx, sql, userId)
 
-	sql = "select * from pressure_test where uid = $1"
-	doSelect(ctx, sql, userId)
+	var input string
+	for  {
+		fmt.Scanln(&input)
+		input = strings.ToLower(input)
+		if input == "e"||input == "exit" {
+			break
+		}
+		if input == "s" {
+			sql = "select * from pressure_test where uid = $1"
+			doSelect(ctx, sql, userId)
+		}
+	}
 }

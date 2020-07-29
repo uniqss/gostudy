@@ -4,6 +4,7 @@ import (
 	"context"
 	"db_pressure_test/common"
 	"fmt"
+	log "github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -11,7 +12,6 @@ import (
 	"math/rand"
 	"sync"
 	"time"
-	log "github.com/sirupsen/logrus"
 )
 
 var wg sync.WaitGroup
