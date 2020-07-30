@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 )
 
@@ -14,7 +15,7 @@ var (
 )
 
 func main() {
-	flag.StringVar(&listenAddr, "listen-addr", ":9090", "server listen address")
+	flag.StringVar(&listenAddr, "listen-addr", ":65432", "server listen address")
 	flag.Parse()
 
 	logger := log.New(os.Stdout, "http:", log.LstdFlags)
@@ -24,7 +25,11 @@ func main() {
 	router := http.NewServeMux()
 	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
-		fmt.Fprintf(w, "hello world")
+		//fmt.Fprintf(w, "hello world.  r.RemoteAddr:%s", r.RemoteAddr)
+		strArr := strings.Split(r.RemoteAddr, ":")
+		if len(strArr) >= 1 {
+			fmt.Fprintf(w, strArr[0])
+		}
 	})
 
 	server := &http.Server{
