@@ -5,12 +5,25 @@ import (
 	"fmt"
 	log "github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
 	"strings"
 	"time"
 )
+
+var __start int64
+func printTimePre() {
+	fmt.Println()
+	fmt.Println(time.Now().Format("2006-01-02 15:04:05"))
+	__start = time.Now().UnixNano()
+}
+func printTimePost() {
+	fmt.Println(time.Now().Format("2006-01-02 15:04:05"))
+	__end := time.Now().UnixNano()
+	fmt.Printf("cost is :%d us    %d ms    %d s \n", (__end-__start)/1000, (__end-__start)/1000000, (__end-__start)/1000000000)
+}
 
 func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
@@ -44,25 +57,34 @@ func main() {
 	userId := 50000000
 	infoJson := "{\"uinfo\":{\"level\":123, \"name\":\"肉山大王\", \"score\":100}, \"Level1\":10000101, \"Level2\":10000101, \"Level3\":10000101}"
 	//infoJson2 := "{\"uinfo\":{\"level\":234, \"name\":\"肉山大王\", \"score\":345}}"
-
-	// insert
-	_, err = collection.InsertOne(ctx, bson.M{"uid": userId, "info_json": infoJson, "quest1":123})
-	if err != nil {
-		log.Error("collection.InsertOne err:", err)
-	}
+	ins := bson.M{"uid": userId, "info_json": infoJson, "quest1": 123}
+	var oid primitive.ObjectID
 
 	var result bson.M
 
-	// find
-	fOne := collection.FindOne(ctx, bson.M{"uid": userId}, &options.FindOneOptions{})
-	if fOne.Err() != nil {
-		log.Warn("collection.FindOne fOne.Err():", fOne.Err())
-	} else {
-		err = fOne.Decode(&result)
+	if 1 == 0 {
+		// insert
+		fmt.Println("calling collection.InsertOne. ins:", ins)
+		insertResult, err := collection.InsertOne(ctx, ins)
 		if err != nil {
-			log.Error("fOne.Decode err:", err)
+			log.Error("collection.InsertOne err:", err)
+		} else {
+			fmt.Println("collection.InsertOne insertResult.InsertedID:", insertResult.InsertedID)
+			oid = insertResult.InsertedID.(primitive.ObjectID)
 		}
-		fmt.Println(result)
+	}
+	if 1 == 1 {
+		// find
+		fOne := collection.FindOne(ctx, bson.M{"uid": userId}, &options.FindOneOptions{})
+		if fOne.Err() != nil {
+			log.Warn("collection.FindOne fOne.Err():", fOne.Err())
+		} else {
+			err = fOne.Decode(&result)
+			if err != nil {
+				log.Error("fOne.Decode err:", err)
+			}
+			fmt.Println(result)
+		}
 	}
 
 	// delete
@@ -76,44 +98,92 @@ func main() {
 		fmt.Println("collection.DeleteMany err:", err)
 	}
 
-	// find
-	fOne = collection.FindOne(ctx, bson.M{"uid": userId}, &options.FindOneOptions{})
-	if fOne.Err() != nil {
-		log.Warn("collection.FindOne fOne.Err():", fOne.Err())
-	} else {
-		err = fOne.Decode(&result)
-		if err != nil {
-			log.Error("fOne.Decode err:", err)
+	if 1 == 1 {
+		// find
+		fOne := collection.FindOne(ctx, bson.M{"uid": userId}, &options.FindOneOptions{})
+		if fOne.Err() != nil {
+			log.Warn("collection.FindOne fOne.Err():", fOne.Err())
+		} else {
+			err = fOne.Decode(&result)
+			if err != nil {
+				log.Error("fOne.Decode err:", err)
+			}
+			fmt.Println(result)
 		}
-		fmt.Println(result)
+	}
+
+	if 1 == 0 {
+		// find by _uid
+		fOne := collection.FindOne(ctx, bson.M{"_id": oid}, &options.FindOneOptions{})
+		if fOne.Err() != nil {
+			log.Warn("collection.FindOne fOne.Err():", fOne.Err())
+		} else {
+			err = fOne.Decode(&result)
+			if err != nil {
+				log.Error("fOne.Decode err:", err)
+			}
+			fmt.Println(result)
+		}
 	}
 
 	// insert
-	_, err = collection.InsertOne(ctx, bson.M{"uid": userId, "info_json": infoJson, "quest1":123})
+	fmt.Println("calling collection.InsertOne. ins:", ins)
+	insertResult, err := collection.InsertOne(ctx, ins)
 	if err != nil {
 		log.Error("collection.InsertOne err:", err)
-	}
-
-	// find
-	fOne = collection.FindOne(ctx, bson.M{"uid": userId}, &options.FindOneOptions{})
-	if fOne.Err() != nil {
-		log.Warn("collection.FindOne fOne.Err():", fOne.Err())
 	} else {
-		err = fOne.Decode(&result)
-		if err != nil {
-			log.Error("fOne.Decode err:", err)
-		}
-		fmt.Println(result)
+		fmt.Println("collection.InsertOne insertResult.InsertedID:", insertResult.InsertedID)
+		oid = insertResult.InsertedID.(primitive.ObjectID)
 	}
 
-	// update
-	_, err = collection.UpdateOne(ctx, bson.M{"uid":userId}, bson.M{"$set":bson.M{"quest1":345, "quest2": "helloworld"}})
-	if err != nil {
-		log.Error("collection.UpdateOne err", err)
+	if 1 == 0 {
+		// find
+		fOne := collection.FindOne(ctx, bson.M{"uid": userId}, &options.FindOneOptions{})
+		if fOne.Err() != nil {
+			log.Warn("collection.FindOne fOne.Err():", fOne.Err())
+		} else {
+			err = fOne.Decode(&result)
+			if err != nil {
+				log.Error("fOne.Decode err:", err)
+			}
+			fmt.Println(result)
+		}
+	}
+
+	if 1 == 1 {
+		// find by _uid
+		fOne := collection.FindOne(ctx, bson.M{"_id": oid}, &options.FindOneOptions{})
+		if fOne.Err() != nil {
+			log.Warn("collection.FindOne fOne.Err():", fOne.Err())
+		} else {
+			err = fOne.Decode(&result)
+			if err != nil {
+				log.Error("fOne.Decode err:", err)
+			}
+			fmt.Println(result)
+		}
+	}
+
+	if 1 == 0 {
+		time.Sleep(time.Nanosecond)
+	}
+
+	if 1 == 0 {
+		// update
+		_, err = collection.UpdateOne(ctx, bson.M{"uid": userId}, bson.M{"$set": bson.M{"quest1": 345, "quest2": "helloWorld"}})
+		if err != nil {
+			log.Error("collection.UpdateOne err", err)
+		}
+	} else {
+		// update by _uid
+		_, err = collection.UpdateOne(ctx, bson.M{"_id": oid}, bson.M{"$set": bson.M{"quest1": 345, "quest2": "helloWorld"}})
+		if err != nil {
+			log.Error("collection.UpdateOne err", err)
+		}
 	}
 
 	var input string
-	for  {
+	for {
 		fmt.Scanln(&input)
 		input = strings.ToLower(input)
 		if input == "e" || input == "exit" {
@@ -121,17 +191,38 @@ func main() {
 		}
 
 		if input == "f" {
-			// find
-			fOne = collection.FindOne(ctx, bson.M{"uid": userId}, &options.FindOneOptions{})
-			if fOne.Err() != nil {
-				log.Warn("collection.FindOne fOne.Err():", fOne.Err())
-			} else {
-				err = fOne.Decode(&result)
-				if err != nil {
-					log.Error("fOne.Decode err:", err)
+			printTimePre()
+			if 1 == 1 {
+				// find
+				fOne := collection.FindOne(ctx, bson.M{"uid": userId}, &options.FindOneOptions{})
+				if fOne.Err() != nil {
+					log.Warn("collection.FindOne fOne.Err():", fOne.Err())
+				} else {
+					err = fOne.Decode(&result)
+					if err != nil {
+						log.Error("fOne.Decode err:", err)
+					}
+					fmt.Println(result)
 				}
-				fmt.Println(result)
 			}
+			printTimePost()
+		}
+		if input == "s" {
+			printTimePre()
+			if 1 == 1 {
+				// find by _uid
+				fOne := collection.FindOne(ctx, bson.M{"_id": oid}, &options.FindOneOptions{})
+				if fOne.Err() != nil {
+					log.Warn("collection.FindOne fOne.Err():", fOne.Err())
+				} else {
+					err = fOne.Decode(&result)
+					if err != nil {
+						log.Error("fOne.Decode err:", err)
+					}
+					fmt.Println(result)
+				}
+			}
+			printTimePost()
 		}
 	}
 }
