@@ -1,0 +1,37 @@
+{
+  "properties": {
+    "id" : {
+      "type": "int64",
+      "sync": "true",
+      "broadcast": "true",
+      "save": "true",
+      "realtime_ms": "true"
+    },
+    "name" : {
+      "type": "string",
+      "sync": "true"
+    },
+    "hp" : {
+      "type": "int64",
+      "save": "false"
+    },
+    "hp_max" : {
+      "type": "int64"
+    }
+  },
+  "tables": {
+    "table_task": {
+      "sync": "true",
+      "broadcast": "true",
+      "save": "true",
+      "realtime_ms": "true",
+
+      "task_id" : "int64",
+      "task_progress" : "int",
+      "finish_time" : "int64"
+    }
+  },
+  "containers": {
+    "container_item": "item"
+  }
+}

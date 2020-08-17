@@ -1,0 +1,6 @@
+{
+  "entities": {
+    "userentity" : ["usercomponent", "equipment"],
+    "guildentity" : ["guildcomponent"]
+  }
+}
