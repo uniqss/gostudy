@@ -2,12 +2,12 @@ package main
 
 import (
 	"fmt"
-	"log_test_zerolog/log_wrapper"
+	"log_test_zerolog/common"
 	"strings"
 )
 
 func testLog(){
-	uLog := log_wrapper.ULogger.With().Timestamp().Str("func", "testLog").Logger()
+	uLog := common.ULogger.With().Timestamp().Str("func", "testLog").Logger()
 
 	uLog.Debug().Str("hello", "world").Msg(" Some Debug log 我是中文哈哈")
 	uLog.Info().Strs("xixi", []string{"haha", "hehe"}).Msg(" Some  Info log 呵呵吼吼")
@@ -19,7 +19,7 @@ func testLog(){
 }
 
 func main() {
-	err := log_wrapper.InitLog("gameserver", "./log/", true)
+	err := common.InitLog("gameserver", "./log/", true)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -35,8 +35,8 @@ func main() {
 		if input == "e" || input == "exit" {
 			break
 		} else {
-			uLog := log_wrapper.ULogger.With().Timestamp().Str("func", "main").Logger()
-			uLog.Info().Str("input", input).Msg("main. user input")
+			uLog := common.ULogger.With().Timestamp().Str("func", "main").Logger()
+			uLog.Info().Str("input", input).Msg("user input")
 		}
 	}
 }

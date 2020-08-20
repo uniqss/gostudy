@@ -1,4 +1,4 @@
-package log_wrapper
+package common
 
 import (
 	"fmt"
@@ -98,8 +98,8 @@ func InitLog(logFileName string, logFolder string, allLog bool) error {
 	}
 
 	// usage
-	//uLog := zerolog.New(log_wrapper.logLevelWriter).With().Str("func", "main").Timestamp().Logger()
-	//uLog.Debug().Str("hello", "world")
+	//uLog := common.ULogger.With().Timestamp().Str("func", "main").Logger()
+	//uLog.Info().Str("input", input).Msg("user input")
 
 	return nil
 }
