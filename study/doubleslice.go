@@ -18,7 +18,7 @@ func (t *Table) SetValue(row int, column int, val interface{}) bool {
 	if column >= t.columnCount {
 		return false
 	} else if row < t.rowCount {
-		t.value[row][column] = valn
+		t.value[row][column] = val
 	} else if row == t.rowCount {
 		t.AppendRow()
 		t.value[row][column] = val
@@ -44,28 +44,56 @@ func (t *Table) AppendRow() {
 	t.value = append(t.value, newRow)
 }
 
+type MsgTableElement struct {
+	iii int
+}
+
+type MsgTableFull struct {
+	Elements [][]MsgTableElement
+}
+type MsgEntityInfoOnline struct {
+	i      int
+	s      string
+	Tables []MsgTableFull
+}
+
+func someFunc() MsgTableFull{
+	msgTableFull := MsgTableFull{}
+	return msgTableFull
+}
+
 func main() {
-	var oneSlice []int
-	for i := 0; i < 4; i++ {
-		oneSlice = append(oneSlice, i)
+	if 1 == 1 {
+		notify := &MsgEntityInfoOnline{}
+		fmt.Println(notify.i)
+		fmt.Println(notify.Tables)
+		notify.Tables = append(notify.Tables, someFunc())
 	}
-	fmt.Println(oneSlice)
 
-	columnCount := 4
-	var value [1][4]int
-	for i := 0; i < columnCount; i++ {
-		value[0][i] = i
+	if 1 == 0 {
+
+		var oneSlice []int
+		for i := 0; i < 4; i++ {
+			oneSlice = append(oneSlice, i)
+		}
+		fmt.Println(oneSlice)
+
+		columnCount := 4
+		var value [1][4]int
+		for i := 0; i < columnCount; i++ {
+			value[0][i] = i
+		}
+		fmt.Println(value)
+
+		t := NewTable(4)
+		fmt.Println(t)
+		t.SetValue(0, 1, 1234)
+		fmt.Println(t)
+		t.SetValue(0, 2, "asdf")
+		fmt.Println(t)
+		t.SetValue(0, 3, 333)
+		fmt.Println(t)
+		t.SetValue(0, 4, 333)
+		fmt.Println(t)
 	}
-	fmt.Println(value)
-
-	t := NewTable(4)
-	fmt.Println(t)
-	t.SetValue(0, 1, 1234)
-	fmt.Println(t)
-	t.SetValue(0, 2, "asdf")
-	fmt.Println(t)
-	t.SetValue(0, 3, 333)
-	fmt.Println(t)
-	t.SetValue(0, 4, 333)
-	fmt.Println(t)
 }

@@ -67,7 +67,7 @@ func CopyFile(src, dst string) (err error) {
 		return
 	}
 	if !sfi.Mode().IsRegular() {
-		// cannot copy non-regular files (e.g., directories,
+		// cannot copy non-regular files (Elements.g., directories,
 		// symlinks, devices, etc.)
 		return fmt.Errorf("CopyFile: non-regular source file %s (%q)", sfi.Name(), sfi.Mode().String())
 	}
