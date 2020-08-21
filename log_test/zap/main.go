@@ -1,22 +1,33 @@
 package main
 
-import "go.uber.org/zap"
+import (
+	"fmt"
+	"strings"
+	"zap/common"
+)
+
+func init() {
+	common.ZLog = common.NewLogger("./log/worldserver.log")
+}
 
 func main() {
-	log, _ := zap.NewProduction()
-	defer log.Sync()
-	log.Info("this is log info")
-	log.Debug("this is debug log")
-	log.Warn("this is warn log")
-	log.Error("this is error log")
-	//log.Fatal("this is fatal log")
-	log.Info("this is info log")
+	zLog := common.ZLog
+	zLog.Debug("this is debug log中文")
+	zLog.Info("This is info log 哈哈")
+	zLog.Warn("This is warn log 哈哈")
+	zLog.Error("This is Error log 哈哈")
+	//zLog.Fatal("This is Fatal log 哈哈")
 
-	suger := log.Sugar()
-	suger.Infow("hello world encountered a config error.",
-		"config", "asdf.xml",
-		"reason", "key not found",
-		"key", "worldhello",
-		"hello", "world",
-		"world", 1234)
+	SomeOther()
+
+	var input string
+	for {
+		fmt.Scanln(&input)
+		input = strings.ToLower(input)
+		if input == "e" || input == "exit" {
+			break
+		} else {
+			zLog.Info("input is:" + input)
+		}
+	}
 }

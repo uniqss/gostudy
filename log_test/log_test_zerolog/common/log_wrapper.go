@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/rs/zerolog"
 	"os"
+	"strings"
 )
 
 var ULogger zerolog.Logger
@@ -38,6 +39,9 @@ func InitLog(logFileName string, logFolder string, allLog bool) error {
 	if logFolder == "" {
 		logFolder = "./"
 	} else {
+		if !strings.HasSuffix(logFolder, "/") {
+			logFolder += "/"
+		}
 		err := os.MkdirAll(logFolder, logFilePerm)
 		if err != nil {
 			fmt.Println("log_wrapper InitLog os.MkdirAll failed. err:", err)

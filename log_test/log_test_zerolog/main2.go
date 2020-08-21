@@ -19,7 +19,7 @@ func testLog(){
 }
 
 func main() {
-	err := common.InitLog("gameserver", "./log/", true)
+	err := common.InitLog("gameserver", "./log", true)
 	if err != nil {
 		fmt.Println(err)
 		return
