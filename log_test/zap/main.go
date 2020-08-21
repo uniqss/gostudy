@@ -7,7 +7,7 @@ import (
 )
 
 func init() {
-	common.ZLog = common.NewLogger("./log/worldserver.log")
+	common.ZLog = common.NewLogger("./log/worldserver.log", true)
 }
 
 func main() {

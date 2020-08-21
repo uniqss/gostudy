@@ -9,7 +9,7 @@ import (
 
 var ZLog *zap.Logger
 
-func NewLogger(logFileName string) *zap.Logger {
+func NewLogger(logFileName string, logToConsole bool) *zap.Logger {
 	// create directory if needed.
 	pos := strings.LastIndex(logFileName, "/")
 	if pos != -1 {
@@ -33,6 +33,9 @@ func NewLogger(logFileName string) *zap.Logger {
 	cfg := zap.NewProductionConfig()
 	cfg.OutputPaths = []string{
 		logFileName,
+	}
+	if logToConsole {
+		cfg.OutputPaths = append(cfg.OutputPaths, "stdout")
 	}
 	log, err := cfg.Build()
 	if err != nil {
