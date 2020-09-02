@@ -124,6 +124,10 @@ func main() {
 	if err != nil {
 		log.Fatal("ioutil.ReadDir failed", err)
 	}
+	err = os.MkdirAll(outPutDir, os.ModePerm)
+	if err != nil {
+		log.Fatal("os.MkdirAll failed. err:", err)
+	}
 
 	for _, f := range files {
 		fName := f.Name()
@@ -139,7 +143,6 @@ func main() {
 		}
 
 		XLSXInfo := ReadOneXLSX(xlsxDir, fName, outPutDir)
-		os.MkdirAll(outPutDir, os.ModePerm)
 		if XLSXInfo != nil {
 			WriteOneXLSX(xlsxDir, outPutDir, XLSXInfo)
 		}
