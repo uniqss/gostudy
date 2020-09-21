@@ -5,7 +5,7 @@ import (
 	"github.com/tealeg/xlsx"
 	"gopkg.in/ini.v1"
 	"io/ioutil"
-	"log"
+	log "github.com/sirupsen/logrus"
 	"os"
 	"strings"
 )
@@ -72,7 +72,10 @@ func WriteOneXLSX(dir string, outPutDir string, info *XLSXInfo) {
 	XLSXName := fromXLSXName[pos:]
 
 	sheetName := XLSXName
+
 	sheetName = strings.TrimSuffix(sheetName, ".xlsx")
+
+	DTConfigsTrimdPrefixPostfix = append(DTConfigsTrimdPrefixPostfix, sheetName)
 
 	var file *xlsx.File
 	var sheet *xlsx.Sheet
@@ -102,6 +105,88 @@ func WriteOneXLSX(dir string, outPutDir string, info *XLSXInfo) {
 		fmt.Printf(err.Error())
 	}
 }
+
+var indent = 0
+func WriteGoLine(file *os.File, str string){
+	for i := 0; i < indent; i++ {
+		file.WriteString("\t")
+	}
+	file.WriteString(str + "\n")
+}
+
+func WriteGoFiles(DTConfigs []string){
+	iniFileName := "uniqs.ini"
+	cfg, err := ini.Load(iniFileName)
+	if err != nil {
+		log.Fatal("ini.Load failed iniFileName:", iniFileName)
+	}
+	outPutDir := cfg.Section("").Key("dtconfig_go_output_dir").String()
+	if !strings.HasSuffix(outPutDir, "\\") && !strings.HasSuffix(outPutDir, "/") {
+		outPutDir += "/"
+	}
+	fmt.Println("dtconfig_go_output_dir:", outPutDir)
+	err = os.MkdirAll(outPutDir, os.ModePerm)
+	if err != nil {
+		log.Error("os.MkdirAll failed. err:", err)
+	}
+
+	fileName := ""
+	var file *os.File
+
+	// export.go
+	if 1 == 1 {
+		indent = 0
+		fileName = "export.go"
+		fileName = outPutDir + fileName
+		file, err = os.OpenFile(fileName, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, os.ModePerm)
+		if err != nil {
+			log.Error("os.Open failed. fileName:", fileName)
+			return
+		}
+		defer file.Close()
+
+		WriteGoLine(file, "package DataTables")
+		WriteGoLine(file, "")
+		for _, c := range DTConfigs {
+			cfg := c
+			cfgData := cfg + "_Data"
+			WriteGoLine(file, "func Get" + cfg + "() *" + cfgData + " {")
+			indent++
+			WriteGoLine(file, "return inst.Get(\"" + cfg + "\").(*" + cfgData + ")")
+			indent--
+			WriteGoLine(file, "}")
+			WriteGoLine(file, "")
+		}
+	}
+
+	// init_generated.go
+	if 1 == 1 {
+		indent = 0
+		fileName = "init_generated.go"
+		fileName = outPutDir + fileName
+		file, err = os.OpenFile(fileName, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, os.ModePerm)
+		if err != nil {
+			log.Error("os.Open failed. fileName:", fileName)
+			return
+		}
+		defer file.Close()
+
+		WriteGoLine(file, "package DataTables")
+		WriteGoLine(file, "")
+		WriteGoLine(file, "func InitGenerated() {")
+		indent++
+		for _, c := range DTConfigs {
+			cfg := c
+			cfgData := cfg + "_Data"
+			WriteGoLine(file, "inst.Register(\"" + cfg + "\", &" + cfgData + "{})")
+		}
+		indent--
+		WriteGoLine(file, "}")
+		WriteGoLine(file, "")
+	}
+}
+
+var DTConfigsTrimdPrefixPostfix []string
 
 func main() {
 	iniFileName := "uniqs.ini"
@@ -147,4 +232,6 @@ func main() {
 			WriteOneXLSX(xlsxDir, outPutDir, XLSXInfo)
 		}
 	}
+
+	WriteGoFiles(DTConfigsTrimdPrefixPostfix)
 }
