@@ -5,6 +5,16 @@ import (
 	"fmt"
 )
 
+type Item struct {
+	Id int32
+	Num int32
+}
+
+type ItemWrapper struct {
+	ItemType string
+	Item string
+}
+
 type Test2 struct {
 	XXX string
 	YYY int32
@@ -55,6 +65,36 @@ func main() {
 		return
 	}
 
+	var items []Item
+	items = append(items, Item{123, 456})
+	items = append(items, Item{234, 345})
+	itemBytes, err := json.Marshal(items)
+	if err != nil {
+		fmt.Println("json.Marshal(items err:", err)
+		return
+	}
+	fmt.Println("itemBytes:", string(itemBytes))
+
 	fmt.Println(t3)
 	fmt.Println(t3.Inner1)
+
+	fmt.Println("============================================================")
+	var itemWrapper ItemWrapper
+	itemWrapper.ItemType = "SomeItem"
+	var item Item
+	item.Id = 1234
+	item.Num = 5678
+	itemBytes, err = json.Marshal(item)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	itemWrapper.Item = string(itemBytes)
+	wrapperBytes, err := json.Marshal(itemWrapper)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	fmt.Println("wrapperBytes:", string(wrapperBytes))
+
 }
