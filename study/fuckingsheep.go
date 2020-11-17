@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-var testAddr = "111.222.123.234:56789"
+var testAddr = "106.15.9.92:10011"
 var working = true
 var count int32
 var sentcount int32
