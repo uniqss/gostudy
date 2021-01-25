@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
+	"gopkg.in/natefinch/lumberjack.v2"
 	"os"
 	"path/filepath"
 	"strings"
@@ -121,50 +122,69 @@ func NewLogger(environment string, logFileName string, suffix string, logToConso
 		return nil, err
 	}
 
-	writeSyncerDebug, closeDebug, err := zap.Open(logFileName + ".debug" + suffix)
-	if err != nil {
-		closeDebug()
-		return nil, err
+	MaxSize := 1
+	MaxBackups := 1024
+	MaxAge := 28
+
+	writeSyncerDebug := zapcore.AddSync(&lumberjack.Logger{
+		Filename:   logFileName + ".debug" + suffix,
+		MaxSize:    MaxSize,
+		MaxBackups: MaxBackups,
+		MaxAge:     MaxAge,
+	})
+
+	writeSyncerInfo := zapcore.AddSync(&lumberjack.Logger{
+		Filename:   logFileName + ".info" + suffix,
+		MaxSize:    MaxSize,
+		MaxBackups: MaxBackups,
+		MaxAge:     MaxAge,
+	})
+
+	writeSyncerWarn := zapcore.AddSync(&lumberjack.Logger{
+		Filename:   logFileName + ".warn" + suffix,
+		MaxSize:    MaxSize,
+		MaxBackups: MaxBackups,
+		MaxAge:     MaxAge,
+	})
+
+	writeSyncerError := zapcore.AddSync(&lumberjack.Logger{
+		Filename:   logFileName + ".error" + suffix,
+		MaxSize:    MaxSize,
+		MaxBackups: MaxBackups,
+		MaxAge:     MaxAge,
+	})
+
+	writeSyncerPanic := zapcore.AddSync(&lumberjack.Logger{
+		Filename:   logFileName + ".panic" + suffix,
+		MaxSize:    MaxSize,
+		MaxBackups: MaxBackups,
+		MaxAge:     MaxAge,
+	})
+
+	writeSyncerFatal := zapcore.AddSync(&lumberjack.Logger{
+		Filename:   logFileName + ".fatal" + suffix,
+		MaxSize:    MaxSize,
+		MaxBackups: MaxBackups,
+		MaxAge:     MaxAge,
+	})
+
+	var encoderFunc func(cfg zapcore.EncoderConfig) zapcore.Encoder
+	if 1 == 0 {
+		// json format
+		encoderFunc = zapcore.NewJSONEncoder
+	} else {
+		// console format
+		encoderFunc = zapcore.NewConsoleEncoder
 	}
 
-	writeSyncerInfo, closeInfo, err := zap.Open(logFileName + ".info" + suffix)
-	if err != nil {
-		closeInfo()
-		return nil, err
-	}
+	coreConsole := zapcore.NewCore(encoderFunc(prodEncoder), writeSyncerConsole, priorityConsole)
 
-	writeSyncerWarn, closeWarn, err := zap.Open(logFileName + ".warn" + suffix)
-	if err != nil {
-		closeWarn()
-		return nil, err
-	}
-
-	writeSyncerError, closeError, err := zap.Open(logFileName + ".error" + suffix)
-	if err != nil {
-		closeError()
-		return nil, err
-	}
-
-	writeSyncerPanic, closePanic, err := zap.Open(logFileName + ".panic" + suffix)
-	if err != nil {
-		closePanic()
-		return nil, err
-	}
-
-	writeSyncerFatal, closeFatal, err := zap.Open(logFileName + ".fatal" + suffix)
-	if err != nil {
-		closeFatal()
-		return nil, err
-	}
-
-	coreConsole := zapcore.NewCore(zapcore.NewJSONEncoder(prodEncoder), writeSyncerConsole, priorityConsole)
-
-	coreDebug := zapcore.NewCore(zapcore.NewJSONEncoder(prodEncoder), writeSyncerDebug, priorityDebug)
-	coreInfo := zapcore.NewCore(zapcore.NewJSONEncoder(prodEncoder), writeSyncerInfo, priorityInfo)
-	coreWarn := zapcore.NewCore(zapcore.NewJSONEncoder(prodEncoder), writeSyncerWarn, priorityWarn)
-	coreError := zapcore.NewCore(zapcore.NewJSONEncoder(prodEncoder), writeSyncerError, priorityError)
-	corePanic := zapcore.NewCore(zapcore.NewJSONEncoder(prodEncoder), writeSyncerPanic, priorityPanic)
-	coreFatal := zapcore.NewCore(zapcore.NewJSONEncoder(prodEncoder), writeSyncerFatal, priorityFatal)
+	coreDebug := zapcore.NewCore(encoderFunc(prodEncoder), writeSyncerDebug, priorityDebug)
+	coreInfo := zapcore.NewCore(encoderFunc(prodEncoder), writeSyncerInfo, priorityInfo)
+	coreWarn := zapcore.NewCore(encoderFunc(prodEncoder), writeSyncerWarn, priorityWarn)
+	coreError := zapcore.NewCore(encoderFunc(prodEncoder), writeSyncerError, priorityError)
+	corePanic := zapcore.NewCore(encoderFunc(prodEncoder), writeSyncerPanic, priorityPanic)
+	coreFatal := zapcore.NewCore(encoderFunc(prodEncoder), writeSyncerFatal, priorityFatal)
 
 	return zap.New(zapcore.NewTee(coreConsole, coreDebug, coreInfo, coreWarn, coreError, corePanic, coreFatal), zap.AddCaller()), nil
 }
