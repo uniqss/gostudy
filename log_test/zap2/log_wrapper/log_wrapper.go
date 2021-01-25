@@ -122,8 +122,8 @@ func NewLogger(environment string, logFileName string, suffix string, logToConso
 		return nil, err
 	}
 
-	MaxSize := 1
-	MaxBackups := 1024
+	MaxSize := 512
+	MaxBackups := 1024 * 1024
 	MaxAge := 28
 
 	writeSyncerDebug := zapcore.AddSync(&lumberjack.Logger{
