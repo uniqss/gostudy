@@ -131,7 +131,7 @@ func doUpdate() {
 	tx.Commit()
 }
 func doSelect() {
-	stmt, err := db.Prepare("select name from foo where id = ?")
+	stmt, err := db.Prepare("select name, xxx from foo where id = ?")
 	if err != nil {
 		log.Println("doSelect err:", err)
 	}

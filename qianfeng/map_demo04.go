@@ -4,13 +4,13 @@ import "fmt"
 
 func main() {
 	/*
-	array:[size]数据类型
-	slice:[]数据类型
-	map:map[key的类型]value的类型
+		array:[size]数据类型
+		slice:[]数据类型
+		map:map[key的类型]value的类型
 
-	slice,map引用类型
-	make()创建的都是引用类型  ,slice,map,channel都是引用类型
-	 */
+		slice,map引用类型
+		make()创建的都是引用类型  ,slice,map,channel都是引用类型
+	*/
 
 	map1 := make(map[int]string)
 	map2 := make(map[string]float64)
@@ -24,7 +24,7 @@ func main() {
 	m1["salary"] = "3000"
 	map3["hr"] = m1
 
-	m2 := map[string]string{"name":"ruby", "age":"28", "salary":"8000"}
+	m2 := map[string]string{"name": "ruby", "age": "28", "salary": "8000"}
 	map3["总经理"] = m2
 	fmt.Println(map3)
 
@@ -38,4 +38,17 @@ func main() {
 	fmt.Println(map5)
 	map5["王二狗"] = "高富帅"
 	fmt.Println(map4, map5)
+
+
+	scene := make(map[string]*int)
+	iChina := 960
+	scene["china"] = &iChina
+	var tmp *int
+	for k, _ := range scene {
+		tmp = scene[k]
+		*tmp *= 100
+	}
+	for k, v := range scene {
+		fmt.Println("k:", k, " v:", *v)
+	}
 }
