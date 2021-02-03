@@ -97,14 +97,14 @@ func NewLogger(environment string, logFileName string, suffix string, logToConso
 				err := os.MkdirAll(logFolder, logFilePerm)
 				if err != nil {
 					logFileName = "./" + logFileName[pos:]
-					fmt.Println("log_wrapper InitLog os.MkdirAll failed. err:", err, " using current dir instead. logFileName:", logFileName)
+					fmt.Println("log_wrapper NewLogger os.MkdirAll failed. err:", err, " using current dir instead. logFileName:", logFileName)
 				}
 			}
 		}
 	} else {
 		// force log to console
 		if !logToConsole {
-			fmt.Println("Warn: zap log NewLogger. as logFileName is empty, logToConsole is set to true")
+			fmt.Println("log_wrapper NewLogger Warn: zap log NewLogger. as logFileName is empty, logToConsole is set to true")
 			logToConsole = true
 		}
 	}
