@@ -8,5 +8,5 @@ func init() {
 	logLevel = "debug"
 	logToConsole = true
 
-	Init_logger(logDir, logLevel, logToConsole)
+	InitLogger(logDir, logLevel, logToConsole)
 }

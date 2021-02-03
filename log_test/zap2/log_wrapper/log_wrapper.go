@@ -28,7 +28,7 @@ func GetLogLevel(logLevel string) zapcore.Level {
 	return zapcore.DebugLevel
 }
 
-func Init_logger(logDir string, logLevel string, logToConsole bool) {
+func InitLogger(logDir string, logLevel string, logToConsole bool) {
 	//logDir := "../log/"
 
 	var logFilePerm os.FileMode = 0644
