@@ -13,14 +13,35 @@ import (
 
 var ZLog *zap.Logger
 
-func init() {
-	logDir := "./log/"
-	logLevel := "debug"
+var zsLog *zap.SugaredLogger
+
+var LogLevelStrs = [...]string{"debug", "info", "warn", "error", "panic", "fatal"}
+
+func GetLogLevel(logLevel string) zapcore.Level {
+	for idx, levelStr := range LogLevelStrs {
+		if levelStr == logLevel {
+			return zapcore.DebugLevel + zapcore.Level(idx)
+		}
+	}
+
+	fmt.Println("log_wrapper GetLogLevel not recognized. using default zapcore.DebugLevel. logLevel:", logLevel)
+	return zapcore.DebugLevel
+}
+
+func Init_logger(logDir string, logLevel string, logToConsole bool) {
+	//logDir := "../log/"
+
+	var logFilePerm os.FileMode = 0644
+	if !strings.HasSuffix(logDir, "/") {
+		logDir += "/"
+	}
+	err := os.MkdirAll(logDir, logFilePerm)
+	if err != nil {
+		panic("log_wrapper Init_logger os.MkdirAll failed. err:" + err.Error())
+	}
 
 	environment := "production"
 	//environment := "development"
-
-	_ = logLevel
 
 	srvName := logDir + filepath.Base(os.Args[0])
 	pos := strings.Index(srvName, ".exe")
@@ -28,7 +49,15 @@ func init() {
 		srvName = srvName[:pos]
 	}
 	//	srvName := logdir + srvType + "." + srvID
-	ZLog, _ = NewLogger(environment, srvName, ".log", true)
+	var zapLogLevel zapcore.Level = GetLogLevel(logLevel)
+
+	ZLog, _ = NewLogger(environment, srvName, ".log", logToConsole, zapLogLevel)
+
+	zsLog = ZLog.Sugar()
+}
+
+func Flush() {
+	ZLog.Sync()
 }
 
 func encodeTimeLayout(t time.Time, layout string, enc zapcore.PrimitiveArrayEncoder) {
@@ -44,10 +73,14 @@ func encodeTimeLayout(t time.Time, layout string, enc zapcore.PrimitiveArrayEnco
 	enc.AppendString(t.Format(layout))
 }
 func UniqsTimeEncoder(t time.Time, enc zapcore.PrimitiveArrayEncoder) {
-	encodeTimeLayout(t, "20060102 15:04:05.000", enc)
+	if 1 == 0 {
+		encodeTimeLayout(t, "20060102 15:04:05.000", enc)
+	} else {
+		encodeTimeLayout(t, "2006-01-02 15:04:05.000", enc)
+	}
 }
 
-func NewLogger(environment string, logFileName string, suffix string, logToConsole bool) (*zap.Logger, error) {
+func NewLogger(environment string, logFileName string, suffix string, logToConsole bool, logLevel zapcore.Level) (*zap.Logger, error) {
 	if logFileName != "" {
 		// create directory if needed.
 		pos := strings.LastIndex(logFileName, "/")
@@ -72,6 +105,7 @@ func NewLogger(environment string, logFileName string, suffix string, logToConso
 		// force log to console
 		if !logToConsole {
 			fmt.Println("Warn: zap log NewLogger. as logFileName is empty, logToConsole is set to true")
+			logToConsole = true
 		}
 	}
 
@@ -80,27 +114,27 @@ func NewLogger(environment string, logFileName string, suffix string, logToConso
 	})
 
 	priorityDebug := zap.LevelEnablerFunc(func(lev zapcore.Level) bool {
-		return lev == zap.DebugLevel
+		return lev == zap.DebugLevel && logLevel <= lev
 	})
 
 	priorityInfo := zap.LevelEnablerFunc(func(lev zapcore.Level) bool {
-		return lev == zap.InfoLevel
+		return lev == zap.InfoLevel && logLevel <= lev
 	})
 
 	priorityWarn := zap.LevelEnablerFunc(func(lev zapcore.Level) bool {
-		return lev == zap.WarnLevel
+		return lev == zap.WarnLevel && logLevel <= lev
 	})
 
 	priorityError := zap.LevelEnablerFunc(func(lev zapcore.Level) bool {
-		return lev == zap.ErrorLevel
+		return lev == zap.ErrorLevel && logLevel <= lev
 	})
 
 	priorityPanic := zap.LevelEnablerFunc(func(lev zapcore.Level) bool {
-		return lev == zap.PanicLevel
+		return lev == zap.PanicLevel && logLevel <= lev
 	})
 
 	priorityFatal := zap.LevelEnablerFunc(func(lev zapcore.Level) bool {
-		return lev == zap.FatalLevel
+		return lev == zap.FatalLevel && logLevel <= lev
 	})
 
 	var prodEncoder zapcore.EncoderConfig
@@ -115,6 +149,17 @@ func NewLogger(environment string, logFileName string, suffix string, logToConso
 	prodEncoder.CallerKey = "BT"
 	prodEncoder.MessageKey = "MSG"
 	prodEncoder.EncodeTime = UniqsTimeEncoder
+
+	var prodEncoderConsole zapcore.EncoderConfig
+	prodEncoderConsole = prodEncoder
+
+	if 1 == 1 {
+		prodEncoderConsole.EncodeLevel = zapcore.CapitalColorLevelEncoder
+		prodEncoder.EncodeLevel = zapcore.CapitalLevelEncoder
+	} else {
+		prodEncoderConsole.EncodeLevel = zapcore.LowercaseColorLevelEncoder
+		prodEncoder.EncodeLevel = zapcore.LowercaseLevelEncoder
+	}
 
 	writeSyncerConsole, closeConsole, err := zap.Open("stdout")
 	if err != nil {
@@ -177,7 +222,7 @@ func NewLogger(environment string, logFileName string, suffix string, logToConso
 		encoderFunc = zapcore.NewConsoleEncoder
 	}
 
-	coreConsole := zapcore.NewCore(encoderFunc(prodEncoder), writeSyncerConsole, priorityConsole)
+	coreConsole := zapcore.NewCore(encoderFunc(prodEncoderConsole), writeSyncerConsole, priorityConsole)
 
 	coreDebug := zapcore.NewCore(encoderFunc(prodEncoder), writeSyncerDebug, priorityDebug)
 	coreInfo := zapcore.NewCore(encoderFunc(prodEncoder), writeSyncerInfo, priorityInfo)
@@ -186,5 +231,9 @@ func NewLogger(environment string, logFileName string, suffix string, logToConso
 	corePanic := zapcore.NewCore(encoderFunc(prodEncoder), writeSyncerPanic, priorityPanic)
 	coreFatal := zapcore.NewCore(encoderFunc(prodEncoder), writeSyncerFatal, priorityFatal)
 
-	return zap.New(zapcore.NewTee(coreConsole, coreDebug, coreInfo, coreWarn, coreError, corePanic, coreFatal), zap.AddCaller()), nil
+	if logToConsole {
+		return zap.New(zapcore.NewTee(coreConsole, coreDebug, coreInfo, coreWarn, coreError, corePanic, coreFatal), zap.AddCaller()), nil
+	} else {
+		return zap.New(zapcore.NewTee(coreDebug, coreInfo, coreWarn, coreError, corePanic, coreFatal), zap.AddCaller()), nil
+	}
 }
