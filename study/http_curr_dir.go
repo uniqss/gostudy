@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 )
 
 /*
@@ -19,14 +20,22 @@ func main() {
 
 	flag.StringVar(&host, "h", "0.0.0.0", "listen host. default 0.0.0.0")
 	flag.IntVar(&port, "p", 60000, "listen port. default 8080")
-	flag.StringVar(&dir, "dir", "./", "local dir to share")
+	flag.StringVar(&dir, "dir", "./share", "local dir to share")
 
 	flag.Parse()
+
+	state, err := os.Stat(dir)
+	if err != nil {
+		dir = "./"
+	}
+	if state == nil || !state.IsDir() {
+		dir = "./"
+	}
 
 	h := http.FileServer(http.Dir(dir))
 	//err := http.ListenAndServe(":8080", h)
 	fmt.Println("host:", host, " port:", port)
-	err := http.ListenAndServe(fmt.Sprintf("%s:%d", host, port), h)
+	err = http.ListenAndServe(fmt.Sprintf("%s:%d", host, port), h)
 	if err != nil {
 		log.Fatal("ListenAndServe:", err)
 	}
