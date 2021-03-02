@@ -19,7 +19,7 @@ func main() {
 	var dir string
 
 	flag.StringVar(&host, "h", "0.0.0.0", "listen host. default 0.0.0.0")
-	flag.IntVar(&port, "p", 60000, "listen port. default 8080")
+	flag.IntVar(&port, "p", 60000, "listen port. default 60000")
 	flag.StringVar(&dir, "dir", "./share", "local dir to share")
 
 	flag.Parse()
