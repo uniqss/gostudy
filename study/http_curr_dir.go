@@ -25,11 +25,18 @@ func main() {
 	flag.Parse()
 
 	state, err := os.Stat(dir)
-	if err != nil {
-		dir = "./"
-	}
-	if state == nil || !state.IsDir() {
-		dir = "./"
+	if err != nil && dir != "./" {
+		if state != nil && !state.IsDir() {
+			fmt.Println("the dir is a file not a folder. using ./ as default. dir:", dir)
+			dir = "./"
+		} else {
+			fmt.Println("dir not exists. trying to create. dir:", dir)
+			err = os.MkdirAll(dir, 0755)
+			if err != nil {
+				fmt.Println("create failed. using ./ as default")
+				dir = "./"
+			}
+		}
 	}
 
 	h := http.FileServer(http.Dir(dir))
